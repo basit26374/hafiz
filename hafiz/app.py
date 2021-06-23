@@ -16,6 +16,7 @@ def get_database_url():
     DB_USER = os.environ.get('DB_USER')
 
     DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+    print(DATABASE_URL)
     return DATABASE_URL
 
 
@@ -28,8 +29,8 @@ def create_app():
     marshmallow.init_app(app)
 
     with app.app_context():
-        from .views import save
-        app.register_blueprint(save.save_bp)
+        from .views import save_bp
+        app.register_blueprint(save_bp)
         return app
 
 

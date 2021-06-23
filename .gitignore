@@ -114,3 +114,6 @@ venv.bak/
 
 # terraform files
 .terraform
+
+# txt files
+*.txt
