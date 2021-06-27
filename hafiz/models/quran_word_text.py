@@ -9,6 +9,4 @@ class QuranWordText(db.Model):
     surah_number = db.Column(db.Integer, nullable=False)
     ayah_number = db.Column(db.Integer, nullable=False)
     word_arabic = db.Column(db.LargeBinary, nullable=False)
-    word_english = db.Column(db.String())
     ayah_text_id = db.Column(db.Integer, db.ForeignKey('quran_ayah_text.id'), nullable=False)
-    english_translation = db.Column(db.String())
