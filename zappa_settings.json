@@ -1,0 +1,28 @@
+{
+    "dev": {
+        "app_function": "hafiz.init_lambda.app",
+        "profile_name": "hafiz",
+        "project_name": "hafiz-flask-app",
+        "runtime": "python3.7",
+        "s3_bucket": "hafiz-flask",
+        "aws_region": "us-east-2",
+        "cors": true,
+        "keep_warm": false,
+        "exclude": [
+            "^(?!__init__).*py$",
+            "terraform",
+            "migrations",
+            "tests",
+            "scripts",
+            ".tox",
+            "*md",
+            "*txt"
+        ],
+        "environment_variables": {
+            "DB_USER": "hafiz",
+            "DB_PASSWORD": "xxxxxxxxxxxxxxx",
+            "DB_HOST": "hafizdb.xxxxxxxxxxxxxxx.us-east-2.rds.amazonaws.com",
+            "DB_NAME": "hafizdb"
+        }
+    }
+}
