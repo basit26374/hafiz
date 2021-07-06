@@ -23,6 +23,8 @@ class SurahData(Resource):
             limit = params.get('limit')
             offset = params.get('offset')
 
+        ayaah = ayaah.filter(QuranAyahText.surah_number==surah_number)
+
         total_rec = ayaah.count()
         if not limit:
             ayaah = ayaah.paginate(page=page, per_page=limit, error_out=False)
