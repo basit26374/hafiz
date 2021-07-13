@@ -6,7 +6,8 @@ import math
 
 from hafiz.app import db
 from hafiz.models.quran_ayah_text import QuranAyahText
-from hafiz.utils.serializers import ayah_serializer
+from hafiz.models.variations import Variations
+from hafiz.utils.serializers import ayah_serializer, variation_serializer
 
 
 class SurahData(Resource):
@@ -47,6 +48,18 @@ class SurahData(Resource):
             'total_pages': total_pages
         }
 
-        # return {"msg": "zappa app deployed",
-        #         "status_code": 200
-        #         }
+
+class AyahVariation(Resource):
+
+    @cors.crossdomain(methods={"HEAD", "OPTIONS", "GET"},
+                      origin='*')
+    def get(self, ayah_id):
+        variations = Variations.query.filter(Variations.ayah_text_id==ayah_id)
+        
+        results = [variation_serializer(variation) for variation in variations]
+
+        return {
+            'num_results': len(results),
+            "objects": results,
+            "status_code": 200
+        }
