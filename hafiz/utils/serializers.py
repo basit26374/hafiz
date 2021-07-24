@@ -13,10 +13,13 @@ def variation_serializer(variation):
     sentence_object_list = [sent_text.query.filter(sent_text.id==sentence_id).with_entities(sent_text.sentence_arabic).all()[0][0]
         for sentence_id in variation.sentence_ids.split("-")]
     
-    sentences = []
+    sentences = ""
     for sentence_object in sentence_object_list:
         for _, value in sentence_object.items():
-            sentences.append(value)
+            if sentences == "":
+                sentences = f"{value}"
+            else:
+                sentences = f"{sentences} {value}"
 
     return{
         "variation_number": variation.variation_number,

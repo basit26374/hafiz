@@ -45,34 +45,55 @@ for row in result:
 
       for variation in ayah_variations:
              sentence_ids_array = variation.sentence_ids.split('-')
-            
-             last_word, first_word = None, None
+             
              final_words_array = []
-             if len(sentence_ids_array) == 1:
-               print('=======================')
-               ayah_sentence = session.query(sentence_table).get(int(sentence_ids_array[0]))
-               words_array = list(ayah_sentence.sentence_arabic.values())[0].split(' ')
-               print(words_array)
+             print('=====================================')
+             for senttence_id in sentence_ids_array:
+                 ayah_sentence = session.query(sentence_table).get(int(senttence_id))
+                 # Split ayah sentence into separate words
+                 words_array = list(ayah_sentence.sentence_arabic.values())[0].split(' ')
+                 print(words_array)
 
-             elif len(sentence_ids_array) == 2:
-                print('-----------------')
-                for idx, sent_id in enumerate(sentence_ids_array):
-                    ayah_sentence = session.query(sentence_table).get(int(sent_id))
-                    words_array = list(ayah_sentence.sentence_arabic.values())[0].split(' ')
-                    print(words_array)
-                    if last_word:
-                       first_word = words_array.pop(0)
-                       combine_word = f'{last_word} {first_word}'
-                       words_array.insert(0, combine_word)
-                       last_word = None
+                 if final_words_array:
+                     last_word = final_words_array.pop(-1)
+                     first_word = words_array.pop(0)
+                     combine_word = f'{last_word} {first_word}'
+                     print('combined words : ', combine_word)
+                     final_words_array.insert(-1, combine_word)
+                     final_words_array.extend(words_array)
+                     print('final_words_array_2 : ', final_words_array)
+                 else:
+                     final_words_array.extend(words_array)
+                     print('final_words_array_1 : ', final_words_array)
+            #  print(final_words_array)
+            
+            #  last_word, first_word = None, None
+            #  final_words_array = []
+            #  if len(sentence_ids_array) == 1:
+            #    print('=======================')
+            #    ayah_sentence = session.query(sentence_table).get(int(sentence_ids_array[0]))
+            #    words_array = list(ayah_sentence.sentence_arabic.values())[0].split(' ')
+            #    print(words_array)
+
+            #  elif len(sentence_ids_array) == 2:
+            #     print('-----------------')
+            #     for idx, sent_id in enumerate(sentence_ids_array):
+            #         ayah_sentence = session.query(sentence_table).get(int(sent_id))
+            #         words_array = list(ayah_sentence.sentence_arabic.values())[0].split(' ')
+            #         print(words_array)
+            #         if last_word:
+            #            first_word = words_array.pop(0)
+            #            combine_word = f'{last_word} {first_word}'
+            #            words_array.insert(0, combine_word)
+            #            last_word = None
                        
-                    if idx == 0:
-                        last_word = words_array.pop(-1)       # pop the last word of ayah_sentence (first element of list)
-                        final_words_array.extend(words_array)
-                    else:
-                        final_words_array.extend(word for word in words_array)
+            #         if idx == 0:
+            #             last_word = words_array.pop(-1)       # pop the last word of ayah_sentence (first element of list)
+            #             final_words_array.extend(words_array)
+            #         else:
+            #             final_words_array.extend(word for word in words_array)
 
-                print(final_words_array)
+            #     print(final_words_array)
                 
 
 # row = result[0]
