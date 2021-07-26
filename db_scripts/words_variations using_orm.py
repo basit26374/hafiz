@@ -1,5 +1,5 @@
 # import sqlalchemy as db
-from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy import create_engine, MetaData, Table, insert
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 Base = declarative_base()
@@ -9,6 +9,7 @@ engine = create_engine('postgresql+psycopg2://hafiz:hafiz@localhost:5432/hafiz')
 Session = sessionmaker(bind = engine)
 session = Session()
 metadata = MetaData()
+metadata.reflect(bind=engine)
 
 # ayah_table = Table('quran_ayah_text', Base.metadata, autoload=True, autoload_with=engine)
 class ayah_table(Base):
@@ -35,8 +36,19 @@ class ayah_variations_table(Base):
           autoload_with=engine
        )
 
-result = session.query(ayah_table).all()
+class words_table(Base):
+       __table__ = Table(
+          'quran_word_text',
+          Base.metadata,
+          autoload=True,
+          autoload_with=engine
+       )
 
+# class words_table(Base):
+#       __tablename__ = 'quran_word_text'
+
+result = session.query(ayah_table).all()
+words_record = []
 for row in result:
    ayah_id = row.id
 
@@ -45,59 +57,34 @@ for row in result:
 
       for variation in ayah_variations:
              sentence_ids_array = variation.sentence_ids.split('-')
-             
+
              final_words_array = []
              print('=====================================')
-             for senttence_id in sentence_ids_array:
-                 ayah_sentence = session.query(sentence_table).get(int(senttence_id))
+             for indx, sentence_id in enumerate(sentence_ids_array):
+                 ayah_sentence = session.query(sentence_table).get(int(sentence_id))
                  # Split ayah sentence into separate words
                  words_array = list(ayah_sentence.sentence_arabic.values())[0].split(' ')
-                 print(words_array)
 
                  if final_words_array:
                      last_word = final_words_array.pop(-1)
                      first_word = words_array.pop(0)
                      combine_word = f'{last_word} {first_word}'
-                     print('combined words : ', combine_word)
-                     final_words_array.insert(-1, combine_word)
+
+                     final_words_array.insert(len(final_words_array), combine_word)
                      final_words_array.extend(words_array)
-                     print('final_words_array_2 : ', final_words_array)
+
                  else:
                      final_words_array.extend(words_array)
-                     print('final_words_array_1 : ', final_words_array)
-            #  print(final_words_array)
-            
-            #  last_word, first_word = None, None
-            #  final_words_array = []
-            #  if len(sentence_ids_array) == 1:
-            #    print('=======================')
-            #    ayah_sentence = session.query(sentence_table).get(int(sentence_ids_array[0]))
-            #    words_array = list(ayah_sentence.sentence_arabic.values())[0].split(' ')
-            #    print(words_array)
+             print(final_words_array)
 
-            #  elif len(sentence_ids_array) == 2:
-            #     print('-----------------')
-            #     for idx, sent_id in enumerate(sentence_ids_array):
-            #         ayah_sentence = session.query(sentence_table).get(int(sent_id))
-            #         words_array = list(ayah_sentence.sentence_arabic.values())[0].split(' ')
-            #         print(words_array)
-            #         if last_word:
-            #            first_word = words_array.pop(0)
-            #            combine_word = f'{last_word} {first_word}'
-            #            words_array.insert(0, combine_word)
-            #            last_word = None
-                       
-            #         if idx == 0:
-            #             last_word = words_array.pop(-1)       # pop the last word of ayah_sentence (first element of list)
-            #             final_words_array.extend(words_array)
-            #         else:
-            #             final_words_array.extend(word for word in words_array)
+             for word_seq, word in enumerate(final_words_array):
+                 rec = words_table(
+                    word_seq=word_seq,
+                    word_arabic=word,
+                    ayah_text_id=ayah_id,
+                    ayah_variation_id=variation.id
+                 )
+                 words_record.append(rec)
 
-            #     print(final_words_array)
-                
-
-# row = result[0]
-# print(row.id)
-# ayah_id = row.id
-# ayah_sentences = session.query(sentence_table).filter(sentence_table.sentence_seq==1).all()
-# print(ayah_sentences)
+session.add_all(words_record)
+session.commit()

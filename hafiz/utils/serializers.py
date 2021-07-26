@@ -22,6 +22,15 @@ def variation_serializer(variation):
                 sentences = f"{sentences} {value}"
 
     return{
+        "id": variation.id,
         "variation_number": variation.variation_number,
         "sentences": sentences
+    }
+
+
+def words_serializer(word):
+    return {
+        "id": word.id,
+        "sequence": word.word_seq,
+        "arabic_word": word.word_arabic
     }

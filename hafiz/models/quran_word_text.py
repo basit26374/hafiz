@@ -6,7 +6,6 @@ class QuranWordText(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     word_seq = db.Column(db.Integer, nullable=False)
-    surah_number = db.Column(db.Integer, nullable=False)
-    ayah_number = db.Column(db.Integer, nullable=False)
-    word_arabic = db.Column(db.LargeBinary, nullable=False)
+    word_arabic = db.Column(db.String(), nullable=False)
     ayah_text_id = db.Column(db.Integer, db.ForeignKey('quran_ayah_text.id'), nullable=False)
+    ayah_variation_id = db.Column(db.Integer, db.ForeignKey('variations.id'), nullable=False)

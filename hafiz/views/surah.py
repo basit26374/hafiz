@@ -7,7 +7,8 @@ import math
 from hafiz.app import db
 from hafiz.models.quran_ayah_text import QuranAyahText
 from hafiz.models.variations import Variations
-from hafiz.utils.serializers import ayah_serializer, variation_serializer
+from hafiz.models.quran_word_text import QuranWordText
+from hafiz.utils.serializers import ayah_serializer, variation_serializer, words_serializer
 
 
 class SurahData(Resource):
@@ -57,6 +58,22 @@ class AyahVariation(Resource):
         variations = Variations.query.filter(Variations.ayah_text_id==ayah_id)
         
         results = [variation_serializer(variation) for variation in variations]
+
+        return {
+            'num_results': len(results),
+            "objects": results,
+            "status_code": 200
+        }
+
+
+class WordsVariation(Resource):
+
+    @cors.crossdomain(methods={"HEAD", "OPTIONS", "GET"},
+                      origin='*')
+    def get(self, variation_id):
+        words = QuranWordText.query.filter(QuranWordText.ayah_variation_id == variation_id)
+
+        results = [words_serializer(word) for word in words]
 
         return {
             'num_results': len(results),
