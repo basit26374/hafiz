@@ -29,8 +29,8 @@ def create_app():
     marshmallow.init_app(app)
 
     with app.app_context():
-        from .views import save_bp, surah_bp, ayah_variation_bp, word_variation_bp
-        app.register_blueprint(save_bp)
+        from .views import reciter_data_bp, surah_bp, ayah_variation_bp, word_variation_bp
+        app.register_blueprint(reciter_data_bp)
         app.register_blueprint(surah_bp)
         app.register_blueprint(ayah_variation_bp)
         app.register_blueprint(word_variation_bp)

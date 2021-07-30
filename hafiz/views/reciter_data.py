@@ -6,9 +6,10 @@ from marshmallow import fields, Schema, validate
 from hafiz.app import db
 
 
-class SaveData(Resource):
+class ReciterData(Resource):
 
     def post(self):
+        print(request.files)
 
         output = {
             'message': 'Object created successfully.',
