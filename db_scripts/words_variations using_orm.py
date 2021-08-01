@@ -2,6 +2,7 @@
 from sqlalchemy import create_engine, MetaData, Table, insert
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from array import array
 Base = declarative_base()
 
 
@@ -47,6 +48,40 @@ class words_table(Base):
 # class words_table(Base):
 #       __tablename__ = 'quran_word_text'
 
+def word_exist(word):
+    word_rec = session.query(words_table).filter_by(word_arabic = word).first()
+    if word_rec:
+        print('exist word_id : ', word_rec.id)
+        return True, word_rec.id
+    else:
+        return False, None
+
+def register_unique_word(word):
+    rec = words_table(
+        word_arabic=word
+    )
+    session.add(rec)
+    session.commit()
+    print('new word_id : ', rec.id)
+    return rec.id
+
+def put_word_ids(word_list, ayah_variations_record):
+    words_ids = []
+    for word in word_list:
+        print('word : ', word)
+        isexist, word_id = word_exist(word)
+        print('isexist, word_id : ', isexist, word_id)
+        if isexist:
+            words_ids.append(word_id)
+        else:
+            record_id = register_unique_word(word)
+            words_ids.append(record_id)
+
+    print('words_ids : ', words_ids)
+    ayah_variations_record.word_ids = array("i", words_ids)
+    session.add(ayah_variations_record)
+    session.commit()
+
 result = session.query(ayah_table).all()
 words_record = []
 for row in result:
@@ -68,7 +103,7 @@ for row in result:
                  if final_words_array:
                      last_word = final_words_array.pop(-1)
                      first_word = words_array.pop(0)
-                     combine_word = f'{last_word} {first_word}'
+                     combine_word = f'{last_word}-{first_word}'
 
                      final_words_array.insert(len(final_words_array), combine_word)
                      final_words_array.extend(words_array)
@@ -77,14 +112,5 @@ for row in result:
                      final_words_array.extend(words_array)
              print(final_words_array)
 
-             for word_seq, word in enumerate(final_words_array):
-                 rec = words_table(
-                    word_seq=word_seq,
-                    word_arabic=word,
-                    ayah_text_id=ayah_id,
-                    ayah_variation_id=variation.id
-                 )
-                 words_record.append(rec)
+             put_word_ids(final_words_array, variation)
 
-session.add_all(words_record)
-session.commit()
