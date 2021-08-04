@@ -2,7 +2,7 @@ from hafiz.app import db
 
 
 class QuranSentenceText(db.Model):
-    __table_name__ = 'quran_sentence_text'
+    __tablename__ = 'quran_sentence_text'
 
     id = db.Column(db.Integer, primary_key=True)
     sentence_seq = db.Column(db.Integer, nullable=False)

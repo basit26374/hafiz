@@ -45,8 +45,14 @@ class words_table(Base):
           autoload_with=engine
        )
 
-# class words_table(Base):
-#       __tablename__ = 'quran_word_text'
+class variation_words_table(Base):
+    __table__ = Table(
+        'variation_words',
+        Base.metadata,
+        autoload=True,
+        autoload_with=engine
+    )
+
 
 def word_exist(word):
     word_rec = session.query(words_table).filter_by(word_arabic = word).first()
@@ -65,25 +71,34 @@ def register_unique_word(word):
     print('new word_id : ', rec.id)
     return rec.id
 
-def put_word_ids(word_list, ayah_variations_record):
+def insert_variation_word(variation_id, word_id):
+    rec = variation_words_table(
+        variation_id=variation_id,
+        word_id=word_id
+    )
+    return rec
+
+def put_variation_word_records(word_list, ayah_variations_record):
     words_ids = []
     for word in word_list:
         print('word : ', word)
         isexist, word_id = word_exist(word)
         print('isexist, word_id : ', isexist, word_id)
         if isexist:
-            words_ids.append(word_id)
+            result = insert_variation_word(ayah_variations_record.id, word_id)
+            variation_words_record.append(result)
         else:
             record_id = register_unique_word(word)
-            words_ids.append(record_id)
+            result = insert_variation_word(ayah_variations_record.id, record_id)
+            variation_words_record.append(result)
 
-    print('words_ids : ', words_ids)
-    ayah_variations_record.word_ids = array("i", words_ids)
-    session.add(ayah_variations_record)
-    session.commit()
+    # print('words_ids : ', words_ids)
+    # ayah_variations_record.word_ids = array("i", words_ids)
+    # session.add(ayah_variations_record)
+    # session.commit()
 
 result = session.query(ayah_table).all()
-words_record = []
+variation_words_record = []
 for row in result:
    ayah_id = row.id
 
@@ -112,5 +127,7 @@ for row in result:
                      final_words_array.extend(words_array)
              print(final_words_array)
 
-             put_word_ids(final_words_array, variation)
+             put_variation_word_records(final_words_array, variation)
 
+session.add_all(variation_words_record)
+session.commit()

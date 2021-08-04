@@ -2,7 +2,7 @@ from hafiz.app import db
 
 
 class RecordingSentence(db.Model):
-    __table_name__ = 'recording_sentence'
+    __tablename__ = 'recording_sentence'
 
     id = db.Column(db.Integer, primary_key=True)
     hafiz_id = db.Column(db.Integer, nullable=True)

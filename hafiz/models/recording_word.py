@@ -2,7 +2,7 @@ from hafiz.app import db
 
 
 class RecordingWord(db.Model):
-    __table_name__ = 'recording_word'
+    __tablename__ = 'recording_word'
 
     id = db.Column(db.Integer, primary_key=True)
     hafiz_id = db.Column(db.Integer, nullable=True)

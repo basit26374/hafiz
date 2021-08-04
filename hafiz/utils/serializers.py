@@ -31,6 +31,5 @@ def variation_serializer(variation):
 def words_serializer(word):
     return {
         "id": word.id,
-        "sequence": word.word_seq,
         "arabic_word": word.word_arabic
     }
