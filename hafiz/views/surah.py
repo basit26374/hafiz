@@ -104,9 +104,17 @@ class WordsVariation(Resource):
                       origin='*')
     def get(self, variation_id):
 
-        variation_record = Variations.query.filter(Variations.id == variation_id).first()
+        # variation_record = Variations.query.filter(Variations.id == variation_id).first()
 
-        results = [words_serializer(word) for word in variation_record.words]
+        # words = QuranWordText.query.join(
+        #     VariationWords, QuranWordText.id == VariationWords.word_id).join(
+        #     Variations, VariationWords.variation_id == Variations.id).add_columns(
+        #         QuranWordText.id, QuranWordText.word_arabic).filter(
+        #             Variations.id == variation_id).all()
+
+        word_object = db.session.execute(f'select qwt.id, qwt.word_arabic from variations v join variation_words vw on vw.variation_id = v.id join quran_word_text qwt on qwt.id = vw.word_id where v.id = {variation_id}')
+
+        results = [words_serializer(word) for word in word_object]
 
         return {
             'num_results': len(results),

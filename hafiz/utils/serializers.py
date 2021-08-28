@@ -30,6 +30,6 @@ def variation_serializer(variation):
 
 def words_serializer(word):
     return {
-        "id": word.id,
-        "arabic_word": word.word_arabic
+        "id": word[0],
+        "arabic_word": word[1]
     }

@@ -100,34 +100,53 @@ def put_variation_word_records(word_list, ayah_variations_record):
 result = session.query(ayah_table).all()
 variation_words_record = []
 for row in result:
-   ayah_id = row.id
+    ayah_id = row.id
 
-   ayah_variations = session.query(ayah_variations_table).filter_by(ayah_text_id = ayah_id).all()
-   if ayah_variations:
+    ayah_variations = session.query(ayah_variations_table).filter_by(ayah_text_id = ayah_id).all()
+    if ayah_variations:
 
-      for variation in ayah_variations:
-             sentence_ids_array = variation.sentence_ids.split('-')
+        for variation in ayah_variations:
+                sentence_ids_array = variation.sentence_ids.split('-')
 
-             final_words_array = []
-             print('=====================================')
-             for indx, sentence_id in enumerate(sentence_ids_array):
-                 ayah_sentence = session.query(sentence_table).get(int(sentence_id))
-                 # Split ayah sentence into separate words
-                 words_array = list(ayah_sentence.sentence_arabic.values())[0].split(' ')
+                final_words_array = []
+                print('=======================================================================')
+                for indx, sentence_id in enumerate(sentence_ids_array):
+                    ayah_sentence = session.query(sentence_table).get(int(sentence_id))
+                    # Split ayah sentence into separate words
+                    words_array = list(ayah_sentence.sentence_arabic.values())[0].split(' ')
 
-                 if final_words_array:
-                     last_word = final_words_array.pop(-1)
-                     first_word = words_array.pop(0)
-                     combine_word = f'{last_word}-{first_word}'
+                    if final_words_array:
+                        last_word = final_words_array.pop(-1)
+                        first_word = words_array.pop(0)
+                        combine_word = f'{last_word}-{first_word}'
 
-                     final_words_array.insert(len(final_words_array), combine_word)
-                     final_words_array.extend(words_array)
+                        final_words_array.insert(len(final_words_array), combine_word)
+                        final_words_array.extend(words_array)
 
-                 else:
-                     final_words_array.extend(words_array)
-             print(final_words_array)
+                    else:
+                        final_words_array.extend(words_array)
+                print(final_words_array)
 
-             put_variation_word_records(final_words_array, variation)
+                put_variation_word_records(final_words_array, variation)
+
+    else:
+        # Get the Sentence text of ayah
+        ayah_sentence = session.query(sentence_table).filter_by(ayah_text_id=ayah_id).first()
+        print(ayah_sentence)
+
+        words_array = list(ayah_sentence.sentence_arabic.values())[0].split(' ')
+
+        # Create the single variation for one sentence ayah
+        variation = ayah_variations_table(
+            ayah_text_id=ayah_id,
+            variation_number=1,
+            sentence_ids=ayah_sentence.id
+        )
+        session.add(variation)
+        session.commit()
+
+        put_variation_word_records(words_array, variation)
+
 
 session.add_all(variation_words_record)
 session.commit()
